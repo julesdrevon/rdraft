@@ -21,18 +21,36 @@ export function Picker() {
   const [latestVersion, setLatestVersion] = React.useState("");
   const [background, setBackground] = React.useState("");
 
-  // Charger le fond d'écran au démarrage
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (!isStarted && list.length < 5) {
+      inputRef.current?.focus();
+    }
+  }, [list.length, isStarted]);
+
+  // Charger un fond d'écran aléatoire (Skin aléatoire inclus)
   React.useEffect(() => {
     const initBg = async () => {
       try {
         const vRes = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
         const versions = await vRes.json();
         const v = versions[0];
+
         const cRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${v}/data/fr_FR/champion.json`);
         const data = await cRes.json();
         const champs = Object.keys(data.data);
-        const randomChamp = champs[Math.floor(Math.random() * champs.length)];
-        setBackground(`https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${randomChamp}_0.jpg`);
+        const randomChampId = champs[Math.floor(Math.random() * champs.length)];
+
+        // Récupérer les détails pour avoir les skins
+        const dRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${v}/data/fr_FR/champion/${randomChampId}.json`);
+        const dData = await dRes.json();
+        const skins = dData.data[randomChampId].skins;
+
+        // Choisir un skin au hasard parmi la liste
+        const randomSkin = skins[Math.floor(Math.random() * skins.length)];
+
+        setBackground(`https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${randomChampId}_${randomSkin.num}.jpg`);
       } catch (e) {
         console.error(e);
       }
@@ -97,6 +115,13 @@ export function Picker() {
   };
 
   const lancerTirage = async () => {
+    const shuffledList = [...list];
+    for (let i = shuffledList.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledList[i], shuffledList[j]] = [shuffledList[j], shuffledList[i]];
+    }
+    setList(shuffledList);
+
     setIsStarted(true);
     setDisplayCount(0);
     setResults([]);
@@ -119,9 +144,6 @@ export function Picker() {
         const randomIndex = Math.floor(Math.random() * pool.length);
         const champion: any = pool.splice(randomIndex, 1)[0];
         const imageUrl = `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champion.image.full}`;
-
-        const img = new Image();
-        img.src = imageUrl;
 
         return {
           name: champion.name,
@@ -151,11 +173,11 @@ export function Picker() {
           className="absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-1000"
           style={{ backgroundImage: `url(${background})` }}
         >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
         </div>
       )}
 
-      <Card className="relative z-10 min-w-sm bg-white/90 dark:bg-stone-900/90 backdrop-blur-md shadow-2xl border-stone-200/20">
+      <Card className="relative z-10 min-w-sm bg-white/90 dark:bg-stone-900/95 backdrop-blur-md shadow-2xl border-stone-200/20">
         <CardHeader>
           <CardTitle>Rdraft</CardTitle>
           <div className="flex flex-col mt-1">
@@ -184,6 +206,7 @@ export function Picker() {
                 {list.length < 5 && (
                   <div className="flex flex-row gap-2 items-center">
                     <Input
+                      ref={inputRef}
                       placeholder="Nom"
                       className="w-32"
                       value={teammate}
@@ -252,7 +275,7 @@ export function Picker() {
           </div>
 
           {isStarted && displayCount === list.length && currentPlayerIndex < list.length && (
-            <div className="flex flex-col items-center gap-3 py-4 border-t border-stone-800">
+            <div className="flex flex-col items-center gap-3 py-4 border-t border-stone-800/30">
               <p className="text-xs font-bold uppercase text-stone-400 italic">Assigner à la lane :</p>
               <div className="flex flex-row gap-2">
                 {availableLanes.map(lane => (
