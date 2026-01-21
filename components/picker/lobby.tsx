@@ -64,7 +64,7 @@ export function Lobby({ players, onAddPlayer, onRemovePlayer }: LobbyProps) {
     <div className="w-full flex flex-col items-center">
       
       {/* Lobby Slots Container */}
-      <div className="flex flex-row items-center justify-center gap-2 sm:gap-6 pt-12 pb-10 relative">
+      <div className="flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-6 pt-6 sm:pt-12 pb-10 relative">
         
 
 
@@ -85,7 +85,7 @@ export function Lobby({ players, onAddPlayer, onRemovePlayer }: LobbyProps) {
             >
               {/* Slot Banner */}
               <div className={cn(
-                "w-[14vw] h-[45vh] max-h-[400px] sm:max-w-[200px] rounded-lg flex items-center justify-center transition-all relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10",
+                "w-[26vw] sm:w-[14vw] h-[35vh] sm:h-[45vh] max-h-[400px] sm:max-w-[200px] rounded-lg flex items-center justify-center transition-all relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10",
                 isFilled 
                   ? "bg-white/10 shadow-2xl border-white/20" 
                   : "hover:bg-white/15 shadow-xl"

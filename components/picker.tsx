@@ -221,7 +221,7 @@ export function Picker() {
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-start pt-12 bg-stone-950 p-4 overflow-hidden gap-8">
       {/* Site Title */}
-      <h1 className="text-6xl md:text-8xl font-league font-normal uppercase tracking-widest text-[#c89c38] relative z-20">
+      <h1 className="text-4xl sm:text-6xl md:text-8xl font-league font-normal uppercase tracking-widest text-[#c89c38] relative z-20">
         Rdraft
       </h1>
       {background && (
@@ -254,7 +254,7 @@ export function Picker() {
                 &mdash; À TOI &mdash;
               </span>
               <p className={cn(
-                "text-4xl font-black uppercase text-white text-center m-0 transition-all duration-75",
+                "text-2xl sm:text-4xl font-black uppercase text-white text-center m-0 transition-all duration-75",
                 isShuffling ? "opacity-70" : "opacity-100 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]"
               )}>
                 {rouletteName || list[currentPlayerIndex].name}
@@ -279,7 +279,7 @@ export function Picker() {
                   <div
                     onClick={() => !isShuffling && !champ.playerName && displayCount === list.length && setSelectedChampIndex(index)}
                     className={cn(
-                        "group h-24 w-24 overflow-hidden shrink-0 flex items-center justify-center bg-stone-900/50 transition-all border-none rounded-md relative",
+                        "group h-16 w-16 sm:h-24 sm:w-24 overflow-hidden shrink-0 flex items-center justify-center bg-stone-900/50 transition-all border-none rounded-md relative",
                         (champ.playerName || isShuffling) ? 'cursor-default' : 'cursor-pointer',
                         selectedChampIndex === index ? 'ring-2 ring-emerald-500 z-20 scale-110 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : ''
                     )}
@@ -305,7 +305,7 @@ export function Picker() {
                     )}
                   </div>
 
-                  <p className="text-[11px] font-bold text-white truncate w-24 text-center">
+                  <p className="text-[10px] sm:text-[11px] font-bold text-white truncate w-16 sm:w-24 text-center">
                     {displayCount > index ? champ.name : "..."}
                   </p>
                 </div>
@@ -360,7 +360,7 @@ export function Picker() {
                   const laneB = b.lane || "";
                   return ALL_LANES.indexOf(laneA) - ALL_LANES.indexOf(laneB);
                 }).map((champ, index) => (
-                  <div key={champ.uid} className="relative w-[18vw] h-[60vh] max-h-[500px] sm:max-w-[280px] overflow-hidden rounded-lg border border-stone-800 group shadow-2xl">
+                  <div key={champ.uid} className="relative w-[38vw] h-[55vh] sm:w-[18vw] sm:h-[60vh] max-h-[500px] sm:max-w-[280px] overflow-hidden rounded-lg border border-stone-800 group shadow-2xl">
                       {/* Loading Image */}
                       <img
                         src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.id}_0.jpg`}
@@ -413,9 +413,9 @@ export function Picker() {
                       <div className="absolute inset-0 p-4">
 
                           {/* EXACT CENTER: Player Profile Icon & Name */}
-                          <div className="absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2 w-full">
+                          <div className="absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 sm:gap-2 w-full">
                               {/* Profile Icon */}
-                              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl bg-black/40">
+                              <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl bg-black/40">
                                   <img 
                                       src={`https://ddragon.leagueoflegends.com/cdn/16.1.1/img/profileicon/${champ.playerIconId}.png`}
                                       alt={champ.playerName}
@@ -423,17 +423,17 @@ export function Picker() {
                                   />
                               </div>
 
-                              <div className="bg-black/60 px-4 py-1 rounded-full border border-white/10 backdrop-blur-md shadow-lg">
-                                <span className="text-lg font-bold text-white uppercase tracking-widest block text-shadow">
+                              <div className="bg-black/60 px-2 py-0.5 sm:px-4 sm:py-1 rounded-full border border-white/10 backdrop-blur-md shadow-lg max-w-[90%]">
+                                <span className="text-xs sm:text-lg font-bold text-white uppercase tracking-widest block text-shadow truncate">
                                     {champ.playerName}
                                 </span>
                               </div>
                           </div>
 
                           {/* BOTTOM: Lane & Champ */}
-                          <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center text-center">
+                          <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 flex flex-col items-center text-center px-1">
                               
-                              <div className="h-14 w-14 rounded-full bg-stone-900/80 border-2 border-stone-600 hover:border-emerald-500 p-3 shadow-xl hover:shadow-emerald-500/20 flex items-center justify-center mb-2 backdrop-blur-sm group-hover:scale-110 transition-all duration-300">
+                              <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-full bg-stone-900/80 border border-stone-600 hover:border-emerald-500 p-2 sm:p-3 shadow-xl hover:shadow-emerald-500/20 flex items-center justify-center mb-1 sm:mb-2 backdrop-blur-sm group-hover:scale-110 transition-all duration-300">
                                 <img 
                                   src={LANE_ICONS[champ.lane || ""]} 
                                   alt={champ.lane || ""} 
@@ -441,7 +441,7 @@ export function Picker() {
                                 />
                               </div>
 
-                              <p className="text-lg font-serif italic text-white text-shadow-lg opacity-80 group-hover:opacity-100 transition-opacity">
+                              <p className="text-xs sm:text-lg font-serif italic text-white text-shadow-lg opacity-80 group-hover:opacity-100 transition-opacity truncate w-full">
                                 {champ.name}
                               </p>
                           </div>
