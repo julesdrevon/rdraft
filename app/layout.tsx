@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
 import "./globals.css";
+import localFont from "next/font/local";
 
-const notoSans = Noto_Sans({variable:'--font-sans'});
+const notoSans = Noto_Sans({variable:'--font-sans', subsets: ["latin"]});
+
+const leagueFont = localFont({
+  src: "./fonts/League.otf",
+  variable: "--font-league",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${notoSans.variable} dark`}>
+    <html lang="fr" className={`${notoSans.variable} ${leagueFont.variable} dark`} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
