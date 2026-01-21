@@ -38,6 +38,12 @@ const LANE_ICONS: Record<string, string> = {
 
 const ALL_LANES = ["TOP", "JGL", "MID", "ADC", "SUPP"];
 
+const HEARTSTEEL_SOUNDS = [
+  "https://static.wikia.nocookie.net/leagueoflegends/images/0/0f/Heartsteel_trigger_SFX_2.ogg",
+  "https://static.wikia.nocookie.net/leagueoflegends/images/9/95/Heartsteel_trigger_SFX.ogg",
+  "https://static.wikia.nocookie.net/leagueoflegends/images/8/87/Heartsteel_trigger_SFX_3.ogg"
+];
+
 const TRANSLATIONS = { fr, en, es, de, it, pt, ru, tr, ja, ko, ar };
 
 const DD_LOCALES: Record<string, string> = {
@@ -52,6 +58,20 @@ const DD_LOCALES: Record<string, string> = {
   ja: "ja_JP",
   ko: "ko_KR",
   ar: "en_US", // Falling back to en_US for Arabic game data
+};
+
+const CD_LOCALES: Record<string, string> = {
+  fr: "fr_fr",
+  en: "default",
+  es: "es_es",
+  de: "de_de",
+  it: "it_it",
+  pt: "pt_br",
+  ru: "ru_ru",
+  tr: "tr_tr",
+  ja: "ja_jp",
+  ko: "ko_kr",
+  ar: "ar_ae",
 };
 
 export function Picker() {
@@ -186,6 +206,20 @@ export function Picker() {
     setSelectedChampIndex(null);
   };
 
+  const playChampVo = (champKey: string | number) => {
+    const locale = CD_LOCALES[lang] || "default";
+    const audio = new Audio(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/${locale}/v1/champion-choose-vo/${champKey}.ogg`);
+    audio.volume = 0.5;
+    audio.play().catch(e => console.error("Champion VO playback failed:", e));
+  };
+
+  const playHeartsteel = () => {
+    const randomIndex = Math.floor(Math.random() * HEARTSTEEL_SOUNDS.length);
+    const audio = new Audio(HEARTSTEEL_SOUNDS[randomIndex]);
+    audio.volume = 0.1; // Low volume as requested
+    audio.play().catch(e => console.error("Heartsteel sound playback failed:", e));
+  };
+
   const assignSelection = (lane: string) => {
     if (selectedChampIndex === null || currentPlayerIndex >= list.length) return;
 
@@ -193,6 +227,9 @@ export function Picker() {
     newResults[selectedChampIndex].playerName = list[currentPlayerIndex].name;
     newResults[selectedChampIndex].playerIconId = list[currentPlayerIndex].iconId;
     newResults[selectedChampIndex].lane = lane;
+    
+    const champ: any = championsPool.find(c => c.name === newResults[selectedChampIndex].name);
+    if (champ) playChampVo(champ.key);
 
     setResults(newResults);
     setCurrentPlayerIndex(prev => prev + 1);
@@ -217,8 +254,10 @@ export function Picker() {
       ...newResults[index],
       name: champion.name,
       id: champion.id,
+      key: champion.key,
       image: `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champion.image.full}`
     };
+
     setResults(newResults);
   };
 
@@ -263,6 +302,7 @@ export function Picker() {
           uid: `slot-${i}-${Date.now()}`, // Stable ID for tracking
           name: champion.name,
           id: champion.id,
+          key: champion.key,
           image: imageUrl,
           playerName: null,
           lane: null
@@ -272,7 +312,10 @@ export function Picker() {
       setResults(selection);
 
       for (let i = 1; i <= selection.length; i++) {
-        setTimeout(() => setDisplayCount(i), 1000 * i);
+        setTimeout(() => {
+          setDisplayCount(i);
+          playHeartsteel();
+        }, 1000 * i);
       }
     } catch (error) {
       console.error(error);
@@ -285,7 +328,7 @@ export function Picker() {
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-start pt-12 bg-stone-950 p-4 overflow-hidden gap-8">
       {/* Site Title & Language Switcher */}
-      <div className="w-full max-w-4xl flex items-center justify-center relative z-[60]">
+      <div className="w-full max-w-4xl flex items-center justify-center relative z-60">
         {/* Helper to keep title centered */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden sm:block">
            {/* Placeholder for symmetry if needed, or leave empty */}
@@ -309,7 +352,7 @@ export function Picker() {
                   }[lang]}
                 </span>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-stone-900/95 border-white/10 backdrop-blur-md min-w-[160px] max-h-[300px] overflow-y-auto silver-scroll z-[70]">
+              <DropdownMenuContent className="bg-stone-900/95 border-white/10 backdrop-blur-md min-w-[160px] max-h-[300px] overflow-y-auto silver-scroll z-70">
                 {(Object.keys(TRANSLATIONS) as Array<keyof typeof TRANSLATIONS>).map((l) => (
                   <DropdownMenuItem 
                     key={l}
@@ -484,11 +527,15 @@ export function Picker() {
                         )}
                         onLoad={() => {
                           const slotUid = champ.uid;
+                          const isRerolling = loadingUids.has(slotUid);
                           const startTime = rerollStartTimes.current[slotUid] || 0;
                           const elapsed = Date.now() - startTime;
                           const remaining = Math.max(0, 500 - elapsed);
 
                           setTimeout(() => {
+                            if (isRerolling && champ.key) {
+                              playChampVo(champ.key);
+                            }
                             setLoadingUids(prev => {
                               const next = new Set(prev);
                               next.delete(slotUid);

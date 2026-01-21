@@ -4,7 +4,7 @@ export const pt = {
   usernamePlaceholder: "Nome de usuário...",
   cancel: "Cancelar",
   add: "Adicionar",
-  enterUsername: "Insira o nome de invocador",
+  enterUsername: "Insira o nome do invocador",
   selectChampion: "Selecione um campeão e uma rota.",
   yourTurn: "SUA VEZ",
   reroll: "Rolar novamente",
