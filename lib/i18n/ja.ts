@@ -20,4 +20,5 @@ export const ja = {
   secretGame: "秘密のミニゲーム",
   reveal: "明かす",
   guessWho: "誰が話している？",
+  audioNotice: "音声の再生に時間がかかる場合があります",
 };

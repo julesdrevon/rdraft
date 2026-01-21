@@ -20,4 +20,5 @@ export const it = {
   secretGame: "Mini-gioco segreto",
   reveal: "Rivelare",
   guessWho: "Chi sta parlando?",
+  audioNotice: "L'audio potrebbe richiedere del tempo per essere riprodotto",
 };

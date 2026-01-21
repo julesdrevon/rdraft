@@ -20,4 +20,5 @@ export const tr = {
   secretGame: "Gizli Mini Oyun",
   reveal: "Açığa çıkarmak",
   guessWho: "Kim konuşuyor?",
+  audioNotice: "Sesin oynatılması biraz zaman alabilir",
 };

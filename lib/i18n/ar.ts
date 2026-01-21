@@ -19,5 +19,6 @@ export const ar = {
   assignToLane: "تعيين للمسار:",
   secretGame: "لعبة سرية صغيرة",
   reveal: "يكشف",
-  guessWho: "مين اللى بيتكلم؟",
+  guessWho: "من هذا؟",
+  audioNotice: "قد يستغرق تشغيل الصوت بعض الوقت",
 };

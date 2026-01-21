@@ -20,4 +20,5 @@ export const ko = {
   secretGame: "비밀 미니 게임",
   reveal: "폭로하다",
   guessWho: "누가 말하고 있나요?",
+  audioNotice: "오디오를 재생하는 데 시간이 걸릴 수 있습니다",
 };

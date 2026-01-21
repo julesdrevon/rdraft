@@ -20,4 +20,5 @@ export const ru = {
   secretGame: "Секретная мини-игра",
   reveal: "Раскрыть",
   guessWho: "Кто говорит?",
+  audioNotice: "Аудио может загружаться некоторое время",
 };

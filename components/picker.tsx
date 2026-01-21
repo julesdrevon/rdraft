@@ -731,29 +731,35 @@ export function Picker() {
                 </p>
               )}
 
-              <div className="flex gap-2 w-full">
-                {!isRevealed ? (
+              <div className="flex flex-col gap-2 w-full">
+                <div className="flex gap-2 w-full">
+                  {!isRevealed ? (
+                    <Button 
+                      onClick={() => setIsRevealed(true)}
+                      className="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs py-1 h-8 cursor-pointer"
+                    >
+                      {t.reveal}
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={startSecretGame}
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs py-1 h-8 cursor-pointer"
+                    >
+                      {t.replay}
+                    </Button>
+                  )}
                   <Button 
-                    onClick={() => setIsRevealed(true)}
-                    className="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs py-1 h-8 cursor-pointer"
+                    variant="outline"
+                    onClick={() => playChampVo(secretChamp.key, secretVoType)}
+                    className="w-10 h-8 border-white/10 hover:bg-white/5 cursor-pointer"
                   >
-                    {t.reveal}
+                    <Volume2 className="w-4 h-4" />
                   </Button>
-                ) : (
-                  <Button 
-                    onClick={startSecretGame}
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs py-1 h-8 cursor-pointer"
-                  >
-                    {t.replay}
-                  </Button>
-                )}
-                <Button 
-                  variant="outline"
-                  onClick={() => playChampVo(secretChamp.key, secretVoType)}
-                  className="w-10 h-8 border-white/10 hover:bg-white/5 cursor-pointer"
-                >
-                  <Volume2 className="w-4 h-4" />
-                </Button>
+                </div>
+                
+                <p className="text-[9px] text-white/30 text-center leading-tight">
+                  {t.audioNotice}
+                </p>
               </div>
               
               <button 
