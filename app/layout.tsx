@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
 import "./globals.css";
 import localFont from "next/font/local";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const notoSans = Noto_Sans({variable:'--font-sans', subsets: ["latin"]});
 
@@ -36,6 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
