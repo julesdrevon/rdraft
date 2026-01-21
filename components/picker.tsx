@@ -91,6 +91,7 @@ export function Picker() {
   const [loadingUids, setLoadingUids] = React.useState<Set<string>>(new Set());
   const [lang, setLang] = React.useState<keyof typeof TRANSLATIONS>("fr");
   const rerollStartTimes = React.useRef<Record<string, number>>({});
+  const audioCache = React.useRef<Record<string, HTMLAudioElement>>({});
 
   const t = TRANSLATIONS[lang];
 
@@ -208,9 +209,28 @@ export function Picker() {
 
   const playChampVo = (champKey: string | number) => {
     const locale = CD_LOCALES[lang] || "default";
+    const cacheKey = `${champKey}-${locale}`;
+
+    if (audioCache.current[cacheKey]) {
+      audioCache.current[cacheKey].currentTime = 0;
+      audioCache.current[cacheKey].play().catch(e => console.error("Cached VO playback failed:", e));
+    } else {
+      const audio = new Audio(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/${locale}/v1/champion-choose-vo/${champKey}.ogg`);
+      audio.volume = 0.5;
+      audio.play().catch(e => console.error("Direct VO playback failed:", e));
+    }
+  };
+
+  const preloadVo = (champKey: string | number) => {
+    const locale = CD_LOCALES[lang] || "default";
+    const cacheKey = `${champKey}-${locale}`;
+    
+    if (audioCache.current[cacheKey]) return;
+
     const audio = new Audio(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/${locale}/v1/champion-choose-vo/${champKey}.ogg`);
     audio.volume = 0.5;
-    audio.play().catch(e => console.error("Champion VO playback failed:", e));
+    audio.preload = "auto";
+    audioCache.current[cacheKey] = audio;
   };
 
   const playHeartsteel = () => {
@@ -257,6 +277,8 @@ export function Picker() {
       key: champion.key,
       image: `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champion.image.full}`
     };
+
+    preloadVo(champion.key);
 
     setResults(newResults);
   };
@@ -310,6 +332,11 @@ export function Picker() {
       });
  
       setResults(selection);
+
+      // Preload everything
+      selection.forEach(slot => {
+        if (slot.key) preloadVo(slot.key);
+      });
 
       for (let i = 1; i <= selection.length; i++) {
         setTimeout(() => {
