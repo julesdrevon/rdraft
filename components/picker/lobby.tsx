@@ -9,13 +9,14 @@ interface LobbyProps {
   players: { name: string; iconId: number }[]
   onAddPlayer: (name: string, iconId: number) => void
   onRemovePlayer: (index: number) => void
+  t: any
 }
 
 // Visual order: Far Left(0), Left(1), Center(2), Right(3), Far Right(4)
 // Priority order: Center, Left, Right, Far Left, Far Right
 const FILL_ORDER = [2, 1, 3, 0, 4]
 
-export function Lobby({ players, onAddPlayer, onRemovePlayer }: LobbyProps) {
+export function Lobby({ players, onAddPlayer, onRemovePlayer, t }: LobbyProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [initialName, setInitialName] = React.useState("")
 
@@ -127,7 +128,7 @@ export function Lobby({ players, onAddPlayer, onRemovePlayer }: LobbyProps) {
                 ) : (
                   <div className="flex flex-col items-center gap-4 text-white/20">
                     <Plus className="w-10 h-10 transition-colors group-hover:text-primary" />
-                    <span className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-40">Ajouter un joueur</span>
+                    <span className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-40">{t.addPlayer}</span>
                   </div>
                 )}
 
@@ -143,8 +144,9 @@ export function Lobby({ players, onAddPlayer, onRemovePlayer }: LobbyProps) {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onConfirm={handleConfirmAdd}
-        title="Ajouter un Joueur"
+        title={t.addPlayerModal}
         initialValue={initialName}
+        t={t}
       />
 
     </div>

@@ -13,9 +13,10 @@ interface HextechModalProps {
   onConfirm: (name: string, iconId: number) => void
   title: string
   initialValue?: string
+  t: any
 }
 
-export function HextechModal({ isOpen, onClose, onConfirm, title, initialValue = "" }: HextechModalProps) {
+export function HextechModal({ isOpen, onClose, onConfirm, title, initialValue = "", t }: HextechModalProps) {
   const [name, setName] = React.useState("")
   const [randomIconId, setRandomIconId] = React.useState<number>(685)
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -69,7 +70,7 @@ export function HextechModal({ isOpen, onClose, onConfirm, title, initialValue =
               {title}
             </DialogTitle>
             <DialogDescription className="text-center text-xs opacity-60">
-              Entrez le nom de l'invocateur
+              {t.enterUsername}
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -79,7 +80,7 @@ export function HextechModal({ isOpen, onClose, onConfirm, title, initialValue =
             ref={inputRef}
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Pseudo..."
+            placeholder={t.usernamePlaceholder}
             className="text-center text-lg h-12 bg-white/5 border-white/10"
           />
 
@@ -90,14 +91,14 @@ export function HextechModal({ isOpen, onClose, onConfirm, title, initialValue =
               onClick={onClose}
               className="hover:bg-white/5"
             >
-              Annuler
+              {t.cancel}
             </Button>
             <Button 
               type="submit" 
               disabled={!name.trim()}
               className="px-8 font-bold uppercase tracking-widest bg-stone-100 text-stone-900 hover:bg-white"
             >
-              Ajouter
+              {t.add}
             </Button>
           </DialogFooter>
         </form>

@@ -8,6 +8,7 @@ interface LaneSelectorProps {
   takenLanes: (string | null)[];
   onSelect: (lane: string) => void;
   disabled?: boolean;
+  t: any;
 }
 
 
@@ -19,14 +20,14 @@ const LANE_ICONS: Record<string, string> = {
   "SUPP": "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/svg/position-utility.svg"
 };
 
-export function LaneSelector({ takenLanes, onSelect, disabled }: LaneSelectorProps) {
+export function LaneSelector({ takenLanes, onSelect, disabled, t }: LaneSelectorProps) {
   const availableLanes = ALL_LANES.filter(lane => !takenLanes.includes(lane));
 
   if (availableLanes.length === 0) return null;
 
   return (
     <div className="flex flex-col items-center gap-3 py-4 border-t border-stone-800/30 w-full animate-in fade-in slide-in-from-bottom-2">
-      <p className="text-xs font-bold uppercase text-stone-500 italic">Assigner à la lane :</p>
+      <p className="text-xs font-bold uppercase text-stone-500 italic">{t.assignToLane}</p>
       <div className="flex flex-row gap-4 flex-wrap justify-center">
         {availableLanes.map(lane => (
           <div key={lane} className="flex flex-col items-center gap-1 group">

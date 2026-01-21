@@ -9,6 +9,23 @@ import { Spinner } from "@/components/ui/spinner"
 import { LaneSelector } from "./picker/lane-selector";
 import { Lobby } from "./picker/lobby";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { fr } from "@/lib/i18n/fr"
+import { en } from "@/lib/i18n/en"
+import { es } from "@/lib/i18n/es"
+import { de } from "@/lib/i18n/de"
+import { it } from "@/lib/i18n/it"
+import { pt } from "@/lib/i18n/pt"
+import { ru } from "@/lib/i18n/ru"
+import { tr } from "@/lib/i18n/tr"
+import { ja } from "@/lib/i18n/ja"
+import { ko } from "@/lib/i18n/ko"
+import { ar } from "@/lib/i18n/ar"
 
 
 const LANE_ICONS: Record<string, string> = {
@@ -20,6 +37,22 @@ const LANE_ICONS: Record<string, string> = {
 };
 
 const ALL_LANES = ["TOP", "JGL", "MID", "ADC", "SUPP"];
+
+const TRANSLATIONS = { fr, en, es, de, it, pt, ru, tr, ja, ko, ar };
+
+const DD_LOCALES: Record<string, string> = {
+  fr: "fr_FR",
+  en: "en_US",
+  es: "es_ES",
+  de: "de_DE",
+  it: "it_IT",
+  pt: "pt_BR",
+  ru: "ru_RU",
+  tr: "tr_TR",
+  ja: "ja_JP",
+  ko: "ko_KR",
+  ar: "en_US", // Falling back to en_US for Arabic game data
+};
 
 export function Picker() {
 
@@ -36,7 +69,10 @@ export function Picker() {
   const [latestVersion, setLatestVersion] = React.useState("");
   const [background, setBackground] = React.useState("");
   const [loadingUids, setLoadingUids] = React.useState<Set<string>>(new Set());
+  const [lang, setLang] = React.useState<keyof typeof TRANSLATIONS>("fr");
   const rerollStartTimes = React.useRef<Record<string, number>>({});
+
+  const t = TRANSLATIONS[lang];
 
 
 
@@ -47,14 +83,16 @@ export function Picker() {
         const vRes = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
         const versions = await vRes.json();
         const v = versions[0];
+        setLatestVersion(v);
 
-        const cRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${v}/data/fr_FR/champion.json`);
+        const locale = DD_LOCALES[lang] || "en_US";
+        const cRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${v}/data/${locale}/champion.json`);
         const data = await cRes.json();
         const champs = Object.keys(data.data);
         const randomChampId = champs[Math.floor(Math.random() * champs.length)];
 
         // Récupérer les détails pour avoir les skins
-        const dRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${v}/data/fr_FR/champion/${randomChampId}.json`);
+        const dRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${v}/data/${locale}/champion/${randomChampId}.json`);
         const dData = await dRes.json();
         const skins = dData.data[randomChampId].skins;
 
@@ -101,6 +139,31 @@ export function Picker() {
       return () => clearInterval(interval);
     }
   }, [currentPlayerIndex, isStarted, displayCount, list]);
+
+  // Refetch Pool and translate active results when language changes
+  React.useEffect(() => {
+    const updateLocale = async () => {
+      if (!latestVersion) return;
+      try {
+        const locale = DD_LOCALES[lang] || "en_US";
+        const res = await fetch(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/${locale}/champion.json`);
+        const data = await res.json();
+        const allChampions = Object.values(data.data) as any[];
+        setChampionsPool(allChampions);
+
+        // Update existing results names
+        if (results.length > 0) {
+          setResults(prev => prev.map(res => {
+            const champ: any = allChampions.find(c => c.id === res.id);
+            return champ ? { ...res, name: champ.name } : res;
+          }));
+        }
+      } catch (e) {
+        console.error("Failed to update locale:", e);
+      }
+    };
+    updateLocale();
+  }, [lang, latestVersion]);
 
   const addPlayer = (name: string, iconId: number) => {
     if (list.length < 5) {
@@ -179,12 +242,13 @@ export function Picker() {
     setSelectedChampIndex(null);
 
     try {
-      const versionRes = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
-      const versions = await versionRes.json();
+      const vRes = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
+      const versions = await vRes.json();
       const version = versions[0];
       setLatestVersion(version);
 
-      const response = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/fr_FR/champion.json`);
+      const locale = DD_LOCALES[lang] || "en_US";
+      const response = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/${locale}/champion.json`);
       const data = await response.json();
       const allChampions = Object.values(data.data);
       setChampionsPool(allChampions);
@@ -220,10 +284,57 @@ export function Picker() {
 
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-start pt-12 bg-stone-950 p-4 overflow-hidden gap-8">
-      {/* Site Title */}
-      <h1 className="text-4xl sm:text-6xl md:text-8xl font-league font-normal uppercase tracking-widest text-[#c89c38] relative z-20">
-        Rdraft
-      </h1>
+      {/* Site Title & Language Switcher */}
+      <div className="w-full max-w-4xl flex items-center justify-center relative z-[60]">
+        {/* Helper to keep title centered */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden sm:block">
+           {/* Placeholder for symmetry if needed, or leave empty */}
+        </div>
+
+        <div className="relative group">
+          <h1 
+            onClick={resetAll}
+            className="text-4xl sm:text-6xl md:text-8xl font-league font-normal uppercase tracking-widest text-[#c89c38] cursor-pointer hover:opacity-80 transition-opacity active:scale-95"
+          >
+            Rdraft
+          </h1>
+          
+          <div className="absolute top-1/2 -right-12 sm:-right-20 -translate-y-1/2">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="focus:outline-none focus:ring-0">
+                <span className="text-3xl sm:text-4xl cursor-pointer hover:scale-110 transition-transform block">
+                  {{
+                    fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪', it: '🇮🇹', 
+                    pt: '🇧🇷', ru: '🇷🇺', tr: '🇹🇷', ja: '🇯🇵', ko: '🇰🇷', ar: '🇸🇦'
+                  }[lang]}
+                </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-stone-900/95 border-white/10 backdrop-blur-md min-w-[160px] max-h-[300px] overflow-y-auto silver-scroll z-[70]">
+                {(Object.keys(TRANSLATIONS) as Array<keyof typeof TRANSLATIONS>).map((l) => (
+                  <DropdownMenuItem 
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className="flex items-center gap-3 cursor-pointer hover:bg-white/10 py-2"
+                  >
+                    <span className="text-xl">
+                      {{
+                        fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪', it: '🇮🇹', 
+                        pt: '🇧🇷', ru: '🇷🇺', tr: '🇹🇷', ja: '🇯🇵', ko: '🇰🇷', ar: '🇸🇦'
+                      }[l]}
+                    </span>
+                    <span className="text-white font-medium capitalize">
+                      {{
+                        fr: 'Français', en: 'English', es: 'Español', de: 'Deutsch', it: 'Italiano',
+                        pt: 'Português', ru: 'Русский', tr: 'Türkçe', ja: '日本語', ko: '한국어', ar: 'العربية'
+                      }[l]}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </div>
       {background && (
         <div
           className="absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-1000"
@@ -240,8 +351,8 @@ export function Picker() {
         <CardHeader>
           <div className="flex flex-col mt-1">
             <CardDescription className="text-center font-bold text-white uppercase tracking-widest">
-              {displayCount < list.length ? "Tirage en cours..." :
-                  currentPlayerIndex < list.length ? "Sélectionnez un champion et une lane." : "Bonne chance 🤣"}
+              {displayCount < list.length ? t.drawing :
+                  currentPlayerIndex < list.length ? t.selectChampion : ""}
             </CardDescription>
           </div>
         </CardHeader>
@@ -251,7 +362,7 @@ export function Picker() {
           {isStarted && displayCount === list.length && currentPlayerIndex < list.length && (
             <div className="flex flex-col items-center gap-2 mb-4 animate-in fade-in zoom-in duration-500">
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-500 animate-pulse">
-                &mdash; À TOI &mdash;
+                &mdash; {t.yourTurn} &mdash;
               </span>
               <p className={cn(
                 "text-2xl sm:text-4xl font-black uppercase text-white text-center m-0 transition-all duration-75",
@@ -267,6 +378,7 @@ export function Picker() {
                 players={list} 
                 onAddPlayer={addPlayer} 
                 onRemovePlayer={removePlayer} 
+                t={t}
               />
 
             ) : (
@@ -318,6 +430,7 @@ export function Picker() {
                 takenLanes={results.map(r => r.lane).filter(Boolean)} 
                 onSelect={assignSelection} 
                 disabled={isShuffling}
+                t={t}
              />
           )}
 
@@ -328,15 +441,15 @@ export function Picker() {
           <div className="w-full flex flex-col items-center gap-2 mt-5">
             {!isStarted ? (
               <Button onClick={lancerTirage} disabled={list.length < 2} className="uppercase tracking-widest bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 cursor-pointer">
-                Lancer le tirage
+                {t.startDraft}
               </Button>
             ) : (
               <div className="flex gap-2">
                 <Button onClick={lancerTirage} className="bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer flex items-center justify-center" disabled={displayCount < results.length}>
-                  <RefreshCw className={`mr-2 h-4 w-4 ${displayCount < results.length ? 'animate-spin' : ''}`} /> Recommencer
+                  <RefreshCw className={`mr-2 h-4 w-4 ${displayCount < results.length ? 'animate-spin' : ''}`} /> {t.restart}
                 </Button>
                 <Button onClick={resetAll} variant="outline" className="cursor-pointer border-rose-500 text-rose-500 hover:bg-rose-50 flex items-center justify-center">
-                  <Trash2 className="mr-2 h-4 w-4" /> Tout effacer
+                  <Trash2 className="mr-2 h-4 w-4" /> {t.clearAll}
                 </Button>
               </div>
             )}
@@ -351,7 +464,7 @@ export function Picker() {
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center animate-in fade-in duration-500">
             <div className="flex flex-col items-center w-full px-4">
               <h2 className="text-3xl sm:text-5xl font-black text-white mb-8 uppercase tracking-[0.2em] drop-shadow-lg">
-                Bonne chance...
+                {t.luckFinal}
               </h2>
               
                <div className="flex flex-row flex-wrap justify-center items-center gap-2 sm:gap-6 w-full">
@@ -404,7 +517,7 @@ export function Picker() {
                             const originalIndex = results.findIndex(r => r.uid === champ.uid);
                             if (originalIndex !== -1) rerollOne(originalIndex);
                         }}
-                        title="Clic pour relancer"
+                        title={t.rerollHint}
                       >
                          <RefreshCw className="w-16 h-16 text-white/90 drop-shadow-lg transition-all duration-500" />
                       </div>
@@ -452,10 +565,10 @@ export function Picker() {
 
               <div className="mt-12 flex gap-4 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-300">
                   <Button onClick={lancerTirage} size="lg" className="bg-stone-100 text-stone-900 hover:bg-white cursor-pointer font-bold uppercase tracking-widest px-8 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                      <RefreshCw className="mr-2 h-5 w-5" /> Rejouer
+                      <RefreshCw className="mr-2 h-5 w-5" /> {t.replay}
                   </Button>
                   <Button onClick={resetAll} size="lg" className="border-rose-500 text-rose-500 bg-[#1b1917] cursor-pointer hover:bg-rose-500 hover:text-white hover:border-rose-500 uppercase tracking-widest transition-colors">
-                      <Trash2 className="mr-2 h-5 w-5" /> Quitter
+                      <Trash2 className="mr-2 h-5 w-5" /> {t.quit}
                   </Button>
               </div>
             </div>
