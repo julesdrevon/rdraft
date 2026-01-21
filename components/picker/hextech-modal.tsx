@@ -89,14 +89,14 @@ export function HextechModal({ isOpen, onClose, onConfirm, title, initialValue =
               type="button" 
               variant="ghost" 
               onClick={onClose}
-              className="hover:bg-white/5"
+              className="hover:bg-white/5 cursor-pointer"
             >
               {t.cancel}
             </Button>
             <Button 
               type="submit" 
               disabled={!name.trim()}
-              className="px-8 font-bold uppercase tracking-widest bg-stone-100 text-stone-900 hover:bg-white"
+              className="px-8 font-bold uppercase tracking-widest bg-stone-100 text-stone-900 hover:bg-white cursor-pointer"
             >
               {t.add}
             </Button>

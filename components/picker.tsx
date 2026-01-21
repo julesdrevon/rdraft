@@ -4,11 +4,12 @@ import * as React from "react"
 import {Card, CardContent, CardTitle, CardHeader, CardDescription, CardFooter} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
 import {Button} from "@/components/ui/button"
-import {Minus, Plus, RefreshCw, Trash2} from "lucide-react";
+import {Minus, Plus, RefreshCw, Trash2, Volume2, Fingerprint} from "lucide-react";
 import { Spinner } from "@/components/ui/spinner"
 import { LaneSelector } from "./picker/lane-selector";
 import { Lobby } from "./picker/lobby";
 import { cn } from "@/lib/utils";
+import { Slider } from "@/components/ui/slider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,8 +93,44 @@ export function Picker() {
   const [lang, setLang] = React.useState<keyof typeof TRANSLATIONS>("fr");
   const rerollStartTimes = React.useRef<Record<string, number>>({});
   const audioCache = React.useRef<Record<string, HTMLAudioElement>>({});
+  const [masterVolume, setMasterVolume] = React.useState(0.5);
+  const masterVolumeRef = React.useRef(0.5);
+
+  React.useEffect(() => {
+    masterVolumeRef.current = masterVolume;
+    console.log("Master Volume changed to:", masterVolume);
+    // Update all preloaded sounds in real-time
+    Object.values(audioCache.current).forEach(audio => {
+      audio.volume = 0.5 * masterVolume;
+    });
+  }, [masterVolume]);
+
+  /* SECRET GAME STATE */
+  const [secretChamp, setSecretChamp] = React.useState<any>(null);
+  const [isRevealed, setIsRevealed] = React.useState(false);
+  const [secretVoType, setSecretVoType] = React.useState<'choose' | 'ban'>('choose');
 
   const t = TRANSLATIONS[lang];
+
+  const startSecretGame = () => {
+    if (championsPool.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * championsPool.length);
+    const champ = championsPool[randomIndex];
+    const type = Math.random() > 0.5 ? 'choose' : 'ban';
+    setSecretChamp(champ);
+    setIsRevealed(false);
+    setSecretVoType(type);
+    
+    // Ensure it's preloaded or play directly
+    const locale = CD_LOCALES[lang] || "default";
+    const cacheKey = `${champ.key}-${locale}-${type}`;
+    if (!audioCache.current[cacheKey]) {
+      preloadVo(champ.key, type);
+    }
+    
+    // Small delay to ensure preload starts if needed
+    setTimeout(() => playChampVo(champ.key, type), 100);
+  };
 
 
 
@@ -207,36 +244,44 @@ export function Picker() {
     setSelectedChampIndex(null);
   };
 
-  const playChampVo = (champKey: string | number) => {
+  const playChampVo = (champKey: string | number, type: 'choose' | 'ban' = 'choose') => {
     const locale = CD_LOCALES[lang] || "default";
-    const cacheKey = `${champKey}-${locale}`;
+    const cacheKey = `${champKey}-${locale}-${type}`;
 
     if (audioCache.current[cacheKey]) {
       audioCache.current[cacheKey].currentTime = 0;
+      audioCache.current[cacheKey].volume = 0.5 * masterVolumeRef.current;
       audioCache.current[cacheKey].play().catch(e => console.error("Cached VO playback failed:", e));
     } else {
-      const audio = new Audio(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/${locale}/v1/champion-choose-vo/${champKey}.ogg`);
-      audio.volume = 0.5;
+      const folder = type === 'choose' ? 'champion-choose-vo' : 'champion-ban-vo';
+      const audio = new Audio(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/${locale}/v1/${folder}/${champKey}.ogg`);
+      audio.volume = 0.5 * masterVolumeRef.current;
       audio.play().catch(e => console.error("Direct VO playback failed:", e));
     }
   };
 
-  const preloadVo = (champKey: string | number) => {
+  const preloadVo = (champKey: string | number, type: 'choose' | 'ban' = 'choose') => {
     const locale = CD_LOCALES[lang] || "default";
-    const cacheKey = `${champKey}-${locale}`;
+    const cacheKey = `${champKey}-${locale}-${type}`;
     
     if (audioCache.current[cacheKey]) return;
 
-    const audio = new Audio(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/${locale}/v1/champion-choose-vo/${champKey}.ogg`);
-    audio.volume = 0.5;
+    const folder = type === 'choose' ? 'champion-choose-vo' : 'champion-ban-vo';
+    const audio = new Audio(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/${locale}/v1/${folder}/${champKey}.ogg`);
+    audio.volume = 0.5 * masterVolumeRef.current;
     audio.preload = "auto";
     audioCache.current[cacheKey] = audio;
+  };
+
+  const preloadImage = (url: string) => {
+    const img = new Image();
+    img.src = url;
   };
 
   const playHeartsteel = () => {
     const randomIndex = Math.floor(Math.random() * HEARTSTEEL_SOUNDS.length);
     const audio = new Audio(HEARTSTEEL_SOUNDS[randomIndex]);
-    audio.volume = 0.1; // Low volume as requested
+    audio.volume = 0.1 * masterVolumeRef.current; // Use Ref to avoid stale closure
     audio.play().catch(e => console.error("Heartsteel sound playback failed:", e));
   };
 
@@ -279,6 +324,9 @@ export function Picker() {
     };
 
     preloadVo(champion.key);
+    preloadImage(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champion.image.full}`);
+    // Preload result screen splash as well
+    preloadImage(`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champion.id}_0.jpg`);
 
     setResults(newResults);
   };
@@ -336,6 +384,9 @@ export function Picker() {
       // Preload everything
       selection.forEach(slot => {
         if (slot.key) preloadVo(slot.key);
+        if (slot.image) preloadImage(slot.image);
+        // Preload result screen splash as well
+        preloadImage(`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${slot.id}_0.jpg`);
       });
 
       for (let i = 1; i <= selection.length; i++) {
@@ -355,12 +406,7 @@ export function Picker() {
   return (
     <main className="relative min-h-screen flex flex-col items-center justify-start pt-12 bg-stone-950 p-4 overflow-hidden gap-8">
       {/* Site Title & Language Switcher */}
-      <div className="w-full max-w-4xl flex items-center justify-center relative z-60">
-        {/* Helper to keep title centered */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden sm:block">
-           {/* Placeholder for symmetry if needed, or leave empty */}
-        </div>
-
+      <div className="w-full max-w-4xl flex flex-col items-center justify-center relative z-60 gap-2">
         <div className="relative group">
           <h1 
             onClick={resetAll}
@@ -403,6 +449,16 @@ export function Picker() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+        </div>
+
+        {/* Volume Control Centered Below Title */}
+        <div className="flex items-center gap-3 group/vol animate-in fade-in slide-in-from-top-1 duration-700">
+          <Volume2 className="w-4 h-4 text-stone-500 group-hover/vol:text-[#c89c38] transition-colors" />
+          <Slider 
+            value={masterVolume} 
+            onChange={setMasterVolume} 
+            className="w-32 sm:w-48" 
+          />
         </div>
       </div>
       {background && (
@@ -561,7 +617,7 @@ export function Picker() {
 
                           setTimeout(() => {
                             if (isRerolling && champ.key) {
-                              playChampVo(champ.key);
+                              // Removed playChampVo(champ.key) as requested
                             }
                             setLoadingUids(prev => {
                               const next = new Set(prev);
@@ -648,6 +704,86 @@ export function Picker() {
             </div>
         </div>
       )}
+      {/* SECRET GAME BUTTON (BOTTOM RIGHT) */}
+      <div className="fixed bottom-6 right-6 z-100 flex flex-col items-end gap-3">
+        {secretChamp && (
+          <div className="bg-stone-900/90 border border-white/10 backdrop-blur-lg p-4 rounded-xl shadow-2xl animate-in slide-in-from-bottom-5 fade-in duration-300 w-64">
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-xs font-bold uppercase text-amber-500 tracking-tighter">{t.guessWho}</p>
+              
+              <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-white/5 bg-black/40">
+                {isRevealed ? (
+                  <img 
+                    src={`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${secretChamp.image.full}`}
+                    alt={secretChamp.name}
+                    className="w-full h-full object-cover animate-in zoom-in-50 duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-4xl font-black text-white/10">?</span>
+                  </div>
+                )}
+              </div>
+
+              {isRevealed && (
+                <p className="text-lg font-bold text-white uppercase tracking-widest animate-in fade-in slide-in-from-top-1">
+                  {secretChamp.name}
+                </p>
+              )}
+
+              <div className="flex gap-2 w-full">
+                {!isRevealed ? (
+                  <Button 
+                    onClick={() => setIsRevealed(true)}
+                    className="flex-1 bg-amber-600 hover:bg-amber-700 text-white text-xs py-1 h-8 cursor-pointer"
+                  >
+                    {t.reveal}
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={startSecretGame}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs py-1 h-8 cursor-pointer"
+                  >
+                    {t.replay}
+                  </Button>
+                )}
+                <Button 
+                  variant="outline"
+                  onClick={() => playChampVo(secretChamp.key, secretVoType)}
+                  className="w-10 h-8 border-white/10 hover:bg-white/5 cursor-pointer"
+                >
+                  <Volume2 className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              <button 
+                onClick={() => setSecretChamp(null)}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-stone-800 rounded-full border border-white/10 text-white/60 hover:text-white flex items-center justify-center text-xs cursor-pointer"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+
+        <Button
+          onClick={secretChamp ? () => setSecretChamp(null) : startSecretGame}
+          className={cn(
+            "w-12 h-12 rounded-full shadow-2xl transition-all duration-300 flex items-center justify-center p-0 cursor-pointer",
+            secretChamp 
+              ? "bg-rose-600 hover:bg-rose-700" 
+              : "bg-[#c89c38] hover:bg-[#a6822d] hover:scale-110"
+          )}
+          title={t.secretGame}
+        >
+          {secretChamp ? (
+             <Plus className="w-6 h-6 text-white rotate-45" />
+          ) : (
+             <Fingerprint className="w-6 h-6 text-white" />
+          )}
+        </Button>
+      </div>
+
     </main>
   )
 }

@@ -17,4 +17,7 @@ export const tr = {
   quit: "Çıkış",
   replay: "Tekrar Oyna",
   assignToLane: "Koridora ata:",
+  secretGame: "Gizli Mini Oyun",
+  reveal: "Açığa çıkarmak",
+  guessWho: "Kim konuşuyor?",
 };

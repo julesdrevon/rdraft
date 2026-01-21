@@ -17,4 +17,7 @@ export const ko = {
   quit: "나가기",
   replay: "다시 플레이",
   assignToLane: "공격로 지정:",
+  secretGame: "비밀 미니 게임",
+  reveal: "폭로하다",
+  guessWho: "누가 말하고 있나요?",
 };

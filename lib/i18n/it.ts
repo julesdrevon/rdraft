@@ -17,4 +17,7 @@ export const it = {
   quit: "Esci",
   replay: "Gioca ancora",
   assignToLane: "Assegna alla corsia:",
+  secretGame: "Mini-gioco segreto",
+  reveal: "Rivelare",
+  guessWho: "Chi sta parlando?",
 };

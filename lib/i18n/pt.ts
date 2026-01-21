@@ -17,4 +17,7 @@ export const pt = {
   quit: "Sair",
   replay: "Jogar novamente",
   assignToLane: "Atribuir à rota:",
+  secretGame: "Mini-jogo secreto",
+  reveal: "revelar",
+  guessWho: "Quem está falando?",
 };

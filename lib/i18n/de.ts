@@ -17,4 +17,7 @@ export const de = {
   quit: "Beenden",
   replay: "Nochmal spielen",
   assignToLane: "Position zuweisen:",
+  secretGame: "Geheimes Minispiel",
+  reveal: "Enthüllen",
+  guessWho: "Wer spricht?",
 };

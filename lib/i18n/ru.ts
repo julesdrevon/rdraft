@@ -17,4 +17,7 @@ export const ru = {
   quit: "Выйти",
   replay: "Играть снова",
   assignToLane: "Назначить на линию:",
+  secretGame: "Секретная мини-игра",
+  reveal: "Раскрыть",
+  guessWho: "Кто говорит?",
 };

@@ -15,6 +15,9 @@ export const ar = {
   clearAll: "مسح الكل",
   luckFinal: "...حظاً موفقاً",
   quit: "خروج",
-  replay: "إعادة السحب",
+  replay: "اللعب مجدداً",
   assignToLane: "تعيين للمسار:",
+  secretGame: "لعبة سرية صغيرة",
+  reveal: "يكشف",
+  guessWho: "مين اللى بيتكلم؟",
 };

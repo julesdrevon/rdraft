@@ -17,4 +17,7 @@ export const en = {
   quit: "Quit",
   replay: "Replay",
   assignToLane: "Assign to lane:",
+  secretGame: "Secret Mini-Game",
+  reveal: "Reveal",
+  guessWho: "Who is speaking?",
 };

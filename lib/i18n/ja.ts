@@ -17,4 +17,7 @@ export const ja = {
   quit: "終了",
   replay: "もう一度プレイ",
   assignToLane: "レーンに割り当てる:",
+  secretGame: "秘密のミニゲーム",
+  reveal: "明かす",
+  guessWho: "誰が話している？",
 };
