@@ -1,4 +1,5 @@
 export const ko = {
+  siteDescription: "아군을 추가하고 드래프트를 시작하세요. 각 플레이어는 추첨을 통해 챔피언과 공격로를 배정받으며, 다음 플레이어를 위한 선택지가 줄어듭니다.",
   addPlayer: "플레이어 추가",
   addPlayerModal: "플레이어 추가",
   usernamePlaceholder: "사용자 이름...",

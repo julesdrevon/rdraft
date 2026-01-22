@@ -30,17 +30,17 @@ export function HextechModal({ isOpen, onClose, onConfirm, title, initialValue =
     }
   }
 
-  // Pick a random icon on open and handle initial value
+  
   React.useEffect(() => {
     if (isOpen) {
       setName(initialValue)
       
-      // Build a verified list of safe iconic/champion icons from DDragon JSON
-      // Confirmed sequential ranges and classic icons in 16.1.1
+      
+      
       const defaultIds = [0, 1, 2]
-      const classicIds = Array.from({ length: 20 }, (_, i) => 10 + i) // 10-29
-      const legacyIds = Array.from({ length: 29 }, (_, i) => 50 + i)  // 50-78
-      const lootIds = Array.from({ length: 50 }, (_, i) => 1000 + i)   // 1000-1049
+      const classicIds = Array.from({ length: 20 }, (_, i) => 10 + i) 
+      const legacyIds = Array.from({ length: 29 }, (_, i) => 50 + i)  
+      const lootIds = Array.from({ length: 50 }, (_, i) => 1000 + i)   
       const safeIds = [...defaultIds, ...classicIds, ...legacyIds, ...lootIds]
       
       const randomId = safeIds[Math.floor(Math.random() * safeIds.length)]
@@ -52,11 +52,11 @@ export function HextechModal({ isOpen, onClose, onConfirm, title, initialValue =
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      {/* Remove animations using duration-0 and explicit animate-none overrides */}
-      <DialogContent className="sm:max-w-md duration-0 animate-none data-[state=open]:animate-none data-[state=closed]:animate-none">
+      {}
+      <DialogContent className="sm:max-w-md duration-0 animate-none data-[state=open]:animate-none data-[state=closed]:animate-none top-1/3 sm:top-1/2 -translate-y-1/2">
         <DialogHeader className="flex flex-col items-center gap-4">
           
-          {/* Random Profile Icon */}
+          {}
           <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl bg-stone-900 mt-2">
             <img 
               src={`https://ddragon.leagueoflegends.com/cdn/${ICON_VERSION}/img/profileicon/${randomIconId}.png`}

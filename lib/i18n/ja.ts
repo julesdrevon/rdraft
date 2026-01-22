@@ -1,4 +1,5 @@
 export const ja = {
+  siteDescription: "味方を追加してドラフトを開始します。各プレイヤーが抽選でチャンピオンとレーンを受け取り、次のプレイヤーの選択肢が減っていきます。",
   addPlayer: "プレイヤーを追加",
   addPlayerModal: "プレイヤーを追加",
   usernamePlaceholder: "ユーザー名...",

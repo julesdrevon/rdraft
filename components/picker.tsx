@@ -58,7 +58,7 @@ const DD_LOCALES: Record<string, string> = {
   tr: "tr_TR",
   ja: "ja_JP",
   ko: "ko_KR",
-  ar: "en_US", // Falling back to en_US for Arabic game data
+  ar: "en_US", 
 };
 
 const CD_LOCALES: Record<string, string> = {
@@ -77,7 +77,6 @@ const CD_LOCALES: Record<string, string> = {
 
 export function Picker() {
 
-  /* PLAYER LIST STATE */
   const [list, setList] = React.useState<{ name: string; iconId: number }[]>([]);
   const [results, setResults] = React.useState<any[]>([]);
   const [isStarted, setIsStarted] = React.useState(false);
@@ -95,17 +94,16 @@ export function Picker() {
   const audioCache = React.useRef<Record<string, HTMLAudioElement>>({});
   const [masterVolume, setMasterVolume] = React.useState(0.5);
   const masterVolumeRef = React.useRef(0.5);
+  const currentAudioRef = React.useRef<HTMLAudioElement | null>(null);
 
   React.useEffect(() => {
     masterVolumeRef.current = masterVolume;
     console.log("Master Volume changed to:", masterVolume);
-    // Update all preloaded sounds in real-time
     Object.values(audioCache.current).forEach(audio => {
       audio.volume = 0.5 * masterVolume;
     });
   }, [masterVolume]);
 
-  /* SECRET GAME STATE */
   const [secretChamp, setSecretChamp] = React.useState<any>(null);
   const [isRevealed, setIsRevealed] = React.useState(false);
   const [secretVoType, setSecretVoType] = React.useState<'choose' | 'ban'>('choose');
@@ -121,20 +119,15 @@ export function Picker() {
     setIsRevealed(false);
     setSecretVoType(type);
     
-    // Ensure it's preloaded or play directly
     const locale = CD_LOCALES[lang] || "default";
     const cacheKey = `${champ.key}-${locale}-${type}`;
     if (!audioCache.current[cacheKey]) {
       preloadVo(champ.key, type);
     }
     
-    // Small delay to ensure preload starts if needed
     setTimeout(() => playChampVo(champ.key, type), 100);
   };
 
-
-
-  // Charger un fond d'écran aléatoire (Skin aléatoire inclus)
   React.useEffect(() => {
     const initBg = async () => {
       try {
@@ -149,12 +142,10 @@ export function Picker() {
         const champs = Object.keys(data.data);
         const randomChampId = champs[Math.floor(Math.random() * champs.length)];
 
-        // Récupérer les détails pour avoir les skins
         const dRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${v}/data/${locale}/champion/${randomChampId}.json`);
         const dData = await dRes.json();
         const skins = dData.data[randomChampId].skins;
 
-        // Choisir un skin au hasard parmi la liste
         const randomSkin = skins[Math.floor(Math.random() * skins.length)];
 
         setBackground(`https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${randomChampId}_${randomSkin.num}.jpg`);
@@ -171,18 +162,12 @@ export function Picker() {
 
 
 
-  /* PLAYER LIST STATE */
-
-
-  // Function to add a player directly (from Lobby modal)
-  // Name Roulette Effect
   React.useEffect(() => {
     if (isStarted && displayCount === list.length && currentPlayerIndex < list.length) {
       setIsShuffling(true);
       let count = 0;
       const maxShuffles = 15;
       const interval = setInterval(() => {
-        // Pick a random name from the list for the "roulette" effect
         const randomName = list[Math.floor(Math.random() * list.length)].name;
         setRouletteName(randomName);
         count++;
@@ -198,7 +183,6 @@ export function Picker() {
     }
   }, [currentPlayerIndex, isStarted, displayCount, list]);
 
-  // Refetch Pool and translate active results when language changes
   React.useEffect(() => {
     const updateLocale = async () => {
       if (!latestVersion) return;
@@ -209,7 +193,7 @@ export function Picker() {
         const allChampions = Object.values(data.data) as any[];
         setChampionsPool(allChampions);
 
-        // Update existing results names
+        
         if (results.length > 0) {
           setResults(prev => prev.map(res => {
             const champ: any = allChampions.find(c => c.id === res.id);
@@ -229,7 +213,6 @@ export function Picker() {
     }
   };
 
-  // Function to remove a specific player (from Lobby X button)
   const removePlayer = (index: number) => {
     const newList = [...list];
     newList.splice(index, 1);
@@ -245,17 +228,25 @@ export function Picker() {
   };
 
   const playChampVo = (champKey: string | number, type: 'choose' | 'ban' = 'choose') => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+    }
+
     const locale = CD_LOCALES[lang] || "default";
     const cacheKey = `${champKey}-${locale}-${type}`;
 
     if (audioCache.current[cacheKey]) {
-      audioCache.current[cacheKey].currentTime = 0;
-      audioCache.current[cacheKey].volume = 0.5 * masterVolumeRef.current;
-      audioCache.current[cacheKey].play().catch(e => console.error("Cached VO playback failed:", e));
+      const audio = audioCache.current[cacheKey];
+      audio.currentTime = 0;
+      audio.volume = 0.5 * masterVolumeRef.current;
+      currentAudioRef.current = audio;
+      audio.play().catch(e => console.error("Cached VO playback failed:", e));
     } else {
       const folder = type === 'choose' ? 'champion-choose-vo' : 'champion-ban-vo';
       const audio = new Audio(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/${locale}/v1/${folder}/${champKey}.ogg`);
       audio.volume = 0.5 * masterVolumeRef.current;
+      currentAudioRef.current = audio;
       audio.play().catch(e => console.error("Direct VO playback failed:", e));
     }
   };
@@ -281,7 +272,7 @@ export function Picker() {
   const playHeartsteel = () => {
     const randomIndex = Math.floor(Math.random() * HEARTSTEEL_SOUNDS.length);
     const audio = new Audio(HEARTSTEEL_SOUNDS[randomIndex]);
-    audio.volume = 0.1 * masterVolumeRef.current; // Use Ref to avoid stale closure
+    audio.volume = 0.1 * masterVolumeRef.current; 
     audio.play().catch(e => console.error("Heartsteel sound playback failed:", e));
   };
 
@@ -325,7 +316,6 @@ export function Picker() {
 
     preloadVo(champion.key);
     preloadImage(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champion.image.full}`);
-    // Preload result screen splash as well
     preloadImage(`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champion.id}_0.jpg`);
 
     setResults(newResults);
@@ -369,7 +359,7 @@ export function Picker() {
         const imageUrl = `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champion.image.full}`;
  
         return {
-          uid: `slot-${i}-${Date.now()}`, // Stable ID for tracking
+          uid: `slot-${i}-${Date.now()}`, 
           name: champion.name,
           id: champion.id,
           key: champion.key,
@@ -381,11 +371,9 @@ export function Picker() {
  
       setResults(selection);
 
-      // Preload everything
       selection.forEach(slot => {
         if (slot.key) preloadVo(slot.key);
         if (slot.image) preloadImage(slot.image);
-        // Preload result screen splash as well
         preloadImage(`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${slot.id}_0.jpg`);
       });
 
@@ -404,13 +392,12 @@ export function Picker() {
   const isFinished = isStarted && displayCount === list.length && currentPlayerIndex === list.length;
 
   return (
-    <main className="relative min-h-screen flex flex-col items-center justify-start pt-12 bg-stone-950 p-4 overflow-hidden gap-8">
-      {/* Site Title & Language Switcher */}
-      <div className="w-full max-w-4xl flex flex-col items-center justify-center relative z-60 gap-2">
+    <main className="relative min-h-dvh flex flex-col items-center justify-start pt-6 sm:pt-12 bg-stone-950 p-4 overflow-hidden gap-4 sm:gap-8">
+      <div className="w-full flex flex-col items-center justify-center relative z-60 gap-2">
         <div className="relative group">
           <h1 
             onClick={resetAll}
-            className="text-4xl sm:text-6xl md:text-8xl font-league font-normal uppercase tracking-widest text-[#c89c38] cursor-pointer hover:opacity-80 transition-opacity active:scale-95"
+            className="text-6xl sm:text-7xl md:text-8xl font-league font-normal uppercase tracking-widest text-[#c89c38] cursor-pointer hover:opacity-80 transition-opacity active:scale-95"
           >
             Rdraft
           </h1>
@@ -420,8 +407,17 @@ export function Picker() {
               <DropdownMenuTrigger className="focus:outline-none focus:ring-0">
                 <span className="text-3xl sm:text-4xl cursor-pointer hover:scale-110 transition-transform block">
                   {{
-                    fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪', it: '🇮🇹', 
-                    pt: '🇧🇷', ru: '🇷🇺', tr: '🇹🇷', ja: '🇯🇵', ko: '🇰🇷', ar: '🇸🇦'
+                    fr: <span className="fi fi-fr rounded-sm" />, 
+                    en: <span className="fi fi-gb rounded-sm" />, 
+                    es: <span className="fi fi-es rounded-sm" />, 
+                    de: <span className="fi fi-de rounded-sm" />, 
+                    it: <span className="fi fi-it rounded-sm" />, 
+                    pt: <span className="fi fi-br rounded-sm" />, 
+                    ru: <span className="fi fi-ru rounded-sm" />, 
+                    tr: <span className="fi fi-tr rounded-sm" />, 
+                    ja: <span className="fi fi-jp rounded-sm" />, 
+                    ko: <span className="fi fi-kr rounded-sm" />, 
+                    ar: <span className="fi fi-sa rounded-sm" />
                   }[lang]}
                 </span>
               </DropdownMenuTrigger>
@@ -434,8 +430,17 @@ export function Picker() {
                   >
                     <span className="text-xl">
                       {{
-                        fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪', it: '🇮🇹', 
-                        pt: '🇧🇷', ru: '🇷🇺', tr: '🇹🇷', ja: '🇯🇵', ko: '🇰🇷', ar: '🇸🇦'
+                        fr: <span className="fi fi-fr rounded-sm" />, 
+                        en: <span className="fi fi-gb rounded-sm" />, 
+                        es: <span className="fi fi-es rounded-sm" />, 
+                        de: <span className="fi fi-de rounded-sm" />, 
+                        it: <span className="fi fi-it rounded-sm" />, 
+                        pt: <span className="fi fi-br rounded-sm" />, 
+                        ru: <span className="fi fi-ru rounded-sm" />, 
+                        tr: <span className="fi fi-tr rounded-sm" />, 
+                        ja: <span className="fi fi-jp rounded-sm" />, 
+                        ko: <span className="fi fi-kr rounded-sm" />, 
+                        ar: <span className="fi fi-sa rounded-sm" />
                       }[l]}
                     </span>
                     <span className="text-white font-medium capitalize">
@@ -451,7 +456,6 @@ export function Picker() {
           </div>
         </div>
 
-        {/* Volume Control Centered Below Title */}
         <div className="flex items-center gap-3 group/vol animate-in fade-in slide-in-from-top-1 duration-700">
           <Volume2 className="w-4 h-4 text-stone-500 group-hover/vol:text-[#c89c38] transition-colors" />
           <Slider 
@@ -460,6 +464,12 @@ export function Picker() {
             className="w-32 sm:w-48" 
           />
         </div>
+
+        {!isStarted && (
+          <p className="text-[10px] sm:text-xs font-medium text-stone-500 uppercase tracking-[0.2em] text-center max-w-[280px] sm:max-w-md mt-2 animate-in fade-in duration-1000 delay-500">
+            {t.siteDescription}
+          </p>
+        )}
       </div>
       {background && (
         <div
@@ -472,7 +482,7 @@ export function Picker() {
 
       {!isFinished && (
       <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-      <Card className="relative min-w-sm bg-transparent border-0 ring-0 shadow-none pointer-events-auto">
+      <Card className="relative w-full min-w-sm bg-transparent border-0 ring-0 shadow-none pointer-events-auto">
         {isStarted && (
         <CardHeader>
           <div className="flex flex-col mt-1">
@@ -484,7 +494,7 @@ export function Picker() {
         </CardHeader>
         )}
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 p-2 sm:p-6 overflow-x-hidden">
           {isStarted && displayCount === list.length && currentPlayerIndex < list.length && (
             <div className="flex flex-col items-center gap-2 mb-4 animate-in fade-in zoom-in duration-500">
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-500 animate-pulse">
@@ -585,22 +595,20 @@ export function Picker() {
       </div>
       )}
 
-      {/* FINAL LOADING SCREEN VIEW */}
       {isFinished && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center animate-in fade-in duration-500">
             <div className="flex flex-col items-center w-full px-4">
-              <h2 className="text-3xl sm:text-5xl font-black text-white mb-8 uppercase tracking-[0.2em] drop-shadow-lg">
+              <h2 className="text-2xl sm:text-4xl font-black text-white mb-6 uppercase tracking-[0.2em] drop-shadow-lg">
                 {t.luckFinal}
               </h2>
               
-               <div className="flex flex-row flex-wrap justify-center items-center gap-2 sm:gap-6 w-full">
+               <div className="flex flex-row flex-wrap justify-center items-center gap-1 sm:gap-4 w-full">
                 {[...results].sort((a, b) => {
                   const laneA = a.lane || "";
                   const laneB = b.lane || "";
                   return ALL_LANES.indexOf(laneA) - ALL_LANES.indexOf(laneB);
                 }).map((champ, index) => (
-                  <div key={champ.uid} className="relative w-[38vw] h-[55vh] sm:w-[18vw] sm:h-[60vh] max-h-[500px] sm:max-w-[280px] overflow-hidden rounded-lg border border-stone-800 group shadow-2xl">
-                      {/* Loading Image */}
+                  <div key={champ.uid} className="relative w-[17vw] h-[25dvh] sm:w-[15vw] sm:h-[55dvh] max-h-[450px] sm:max-w-[240px] overflow-hidden rounded-lg border border-stone-800 group shadow-2xl">
                       <img
                         src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.id}_0.jpg`}
                         alt={champ.name}
@@ -617,7 +625,7 @@ export function Picker() {
 
                           setTimeout(() => {
                             if (isRerolling && champ.key) {
-                              // Removed playChampVo(champ.key) as requested
+                              playChampVo(champ.key);
                             }
                             setLoadingUids(prev => {
                               const next = new Set(prev);
@@ -629,17 +637,14 @@ export function Picker() {
                         }}
                       />
 
-                      {/* Loading Animation Overlay */}
                       {loadingUids.has(champ.uid) && (
                         <div className="absolute inset-0 z-30 flex items-center justify-center bg-stone-900/40 backdrop-blur-sm animate-pulse">
                            <RefreshCw className="w-12 h-12 text-amber-500/80 animate-spin" />
                         </div>
                       )}
                       
-                      {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
 
-                      {/* Reroll Overlay - Centered */}
                        <div 
                         className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/50 backdrop-blur-[2px] cursor-pointer"
                         onClick={(e) => {
@@ -652,13 +657,13 @@ export function Picker() {
                          <RefreshCw className="w-16 h-16 text-white/90 drop-shadow-lg transition-all duration-500" />
                       </div>
  
-                      {/* Content Overlay */}
+                      {}
                       <div className="absolute inset-0 p-4">
 
-                          {/* EXACT CENTER: Player Profile Icon & Name */}
+                          {}
                           <div className="absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 sm:gap-2 w-full">
-                              {/* Profile Icon */}
-                              <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl bg-black/40">
+                              {}
+                              <div className="w-8 h-8 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl bg-black/40">
                                   <img 
                                       src={`https://ddragon.leagueoflegends.com/cdn/16.1.1/img/profileicon/${champ.playerIconId}.png`}
                                       alt={champ.playerName}
@@ -666,17 +671,16 @@ export function Picker() {
                                   />
                               </div>
 
-                              <div className="bg-black/60 px-2 py-0.5 sm:px-4 sm:py-1 rounded-full border border-white/10 backdrop-blur-md shadow-lg max-w-[90%]">
-                                <span className="text-xs sm:text-lg font-bold text-white uppercase tracking-widest block text-shadow truncate">
+                              <div className="bg-black/60 px-1 py-0 sm:px-4 sm:py-1 rounded-full border border-white/10 backdrop-blur-md shadow-lg max-w-[90%]">
+                                <span className="text-[7px] sm:text-base font-bold text-white uppercase tracking-widest block text-shadow truncate">
                                     {champ.playerName}
                                 </span>
                               </div>
                           </div>
 
-                          {/* BOTTOM: Lane & Champ */}
-                          <div className="absolute bottom-3 sm:bottom-6 left-0 right-0 flex flex-col items-center text-center px-1">
+                          <div className="absolute bottom-2 sm:bottom-6 left-0 right-0 flex flex-col items-center text-center px-0.5">
                               
-                              <div className="h-10 w-10 sm:h-14 sm:w-14 rounded-full bg-stone-900/80 border border-stone-600 hover:border-emerald-500 p-2 sm:p-3 shadow-xl hover:shadow-emerald-500/20 flex items-center justify-center mb-1 sm:mb-2 backdrop-blur-sm group-hover:scale-110 transition-all duration-300">
+                              <div className="h-6 w-6 sm:h-12 sm:w-12 rounded-full bg-stone-900/80 border border-stone-600 hover:border-emerald-500 p-1.5 sm:p-2.5 shadow-xl hover:shadow-emerald-500/20 flex items-center justify-center mb-0.5 sm:mb-2 backdrop-blur-sm group-hover:scale-110 transition-all duration-300">
                                 <img 
                                   src={LANE_ICONS[champ.lane || ""]} 
                                   alt={champ.lane || ""} 
@@ -684,7 +688,7 @@ export function Picker() {
                                 />
                               </div>
 
-                              <p className="text-xs sm:text-lg font-serif italic text-white text-shadow-lg opacity-80 group-hover:opacity-100 transition-opacity truncate w-full">
+                              <p className="text-[8px] sm:text-base font-serif italic text-white text-shadow-lg opacity-80 group-hover:opacity-100 transition-opacity truncate w-full">
                                 {champ.name}
                               </p>
                           </div>
@@ -692,8 +696,11 @@ export function Picker() {
                   </div>
                 ))}
               </div>
+              <p className="text-[10px] sm:text-xs font-bold text-amber-500/80 uppercase tracking-widest mt-6 sm:mt-8 animate-bounce">
+                {t.rerollHint}
+              </p>
 
-              <div className="mt-12 flex gap-4 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-300">
+              <div className="mt-4 sm:mt-8 flex gap-4 animate-in slide-in-from-bottom-10 fade-in duration-700 delay-300">
                   <Button onClick={lancerTirage} size="lg" className="bg-stone-100 text-stone-900 hover:bg-white cursor-pointer font-bold uppercase tracking-widest px-8 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                       <RefreshCw className="mr-2 h-5 w-5" /> {t.replay}
                   </Button>
@@ -704,7 +711,7 @@ export function Picker() {
             </div>
         </div>
       )}
-      {/* SECRET GAME BUTTON (BOTTOM RIGHT) */}
+
       <div className="fixed bottom-6 right-6 z-100 flex flex-col items-end gap-3">
         {secretChamp && (
           <div className="bg-stone-900/90 border border-white/10 backdrop-blur-lg p-4 rounded-xl shadow-2xl animate-in slide-in-from-bottom-5 fade-in duration-300 w-64">

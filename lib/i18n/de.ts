@@ -1,4 +1,5 @@
 export const de = {
+  siteDescription: "Füge deine Verbündeten hinzu und starte den Draft: Jeder Spieler wird ausgelost, um seinen Champion und seine Lane zu erhalten, wodurch die verfügbaren Optionen für die nächsten Spieler reduziert werden.",
   addPlayer: "Spieler hinzufügen",
   addPlayerModal: "Einen Spieler hinzufügen",
   usernamePlaceholder: "Benutzername...",

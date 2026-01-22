@@ -20,8 +20,8 @@ export interface Champion {
 }
 
 export interface DraftSelection {
-  name: string;      // Champion name
-  imageUrl: string;  // Full URL to loading or splash image
+  name: string;      
+  imageUrl: string;  
   playerName: string | null;
   lane: string | null;
 }

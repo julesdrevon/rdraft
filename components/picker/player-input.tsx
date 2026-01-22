@@ -25,7 +25,7 @@ export function PlayerInput({ list, onAdd, onRemoveLast, isStarted }: PlayerInpu
   };
 
   if (isStarted) {
-    // Read-only view during draft
+    
     return (
       <div className="flex flex-row flex-wrap gap-2 items-center justify-center">
         {list.map((name, index) => (

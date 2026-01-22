@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
 import "./globals.css";
+import "flag-icons/css/flag-icons.min.css";
 import localFont from "next/font/local";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 

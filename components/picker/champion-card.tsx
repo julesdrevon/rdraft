@@ -9,8 +9,8 @@ interface ChampionCardProps {
   selection: DraftSelection;
   index: number;
   revealed: boolean;
-  isFinished: boolean; // Entire draft finished
-  isSelected: boolean; // Currently selected for lane assignment
+  isFinished: boolean; 
+  isSelected: boolean; 
   onClick: () => void;
   onReroll: () => void;
 }
@@ -24,16 +24,16 @@ export function ChampionCard({
   onReroll
 }: ChampionCardProps) {
   
-  // Decide interactions
-  // Can click to select IF: it's revealed AND not yet assigned a player (or special logic)
-  // Actually logic from original:
-  // onClick is allowed if !selection.playerName && isFinished(aka displayCount==list.length)
+  
+  
+  
+  
   
   const canClick = revealed && !selection.playerName; 
   
   return (
     <div className="flex flex-col items-center gap-1">
-      {/* Player Name Badge (Assigned) */}
+      {}
       <span className="text-[10px] font-black uppercase h-4 text-emerald-400">
         {selection.playerName || ""}
       </span>
@@ -57,7 +57,7 @@ export function ChampionCard({
               />
             </div>
 
-            {/* Reroll Overlay */}
+            {}
             {isFinished && (
               <div
                 onClick={(e) => { e.stopPropagation(); onReroll(); }}
@@ -67,7 +67,7 @@ export function ChampionCard({
               </div>
             )}
 
-            {/* Lane Badge */}
+            {}
             {selection.lane && (
               <div className="absolute bottom-0 left-0 w-full bg-emerald-600 text-[10px] text-white py-0.5 font-bold text-center uppercase z-10">
                 {selection.lane}

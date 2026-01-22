@@ -1,4 +1,5 @@
 export const fr = {
+  siteDescription: "Ajoutez vos alliés et lancez le draft : chaque joueur est tiré au sort pour recevoir son champion et sa lane, réduisant les options disponibles pour les suivants.",
   addPlayer: "Ajouter un joueur",
   addPlayerModal: "Ajouter un Joueur",
   usernamePlaceholder: "Pseudo...",
@@ -8,7 +9,7 @@ export const fr = {
   selectChampion: "Sélectionnez un champion et une lane.",
   yourTurn: "À TOI",
   reroll: "Relancer",
-  rerollHint: "Clic pour relancer",
+  rerollHint: "Clique sur un champion pour le relancer",
   drawing: "Tirage en cours...",
   startDraft: "Lancer le tirage",
   restart: "Recommencer",

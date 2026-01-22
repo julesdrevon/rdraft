@@ -21,14 +21,14 @@ export function useDragon(): UseDragonReturn {
     const init = async () => {
       try {
         setLoading(true);
-        // 1. Get Versions
+        
         const vRes = await fetch("https://ddragon.leagueoflegends.com/api/versions.json");
         if (!vRes.ok) throw new Error("Failed to fetch versions");
         const versions = await vRes.json();
         const latestInfo = versions[0];
         setVersion(latestInfo);
 
-        // 2. Get Champions
+        
         const cRes = await fetch(
           `https://ddragon.leagueoflegends.com/cdn/${latestInfo}/data/fr_FR/champion.json`
         );
@@ -52,8 +52,8 @@ export function useDragon(): UseDragonReturn {
 
     try {
       const randomChamp = champions[Math.floor(Math.random() * champions.length)];
-      // Provide detail fetch if we need skins, but checking basic validity first
-      // To get skins, we need the individual champion details:
+      
+      
       const dRes = await fetch(
         `https://ddragon.leagueoflegends.com/cdn/${version}/data/fr_FR/champion/${randomChamp.id}.json`
       );

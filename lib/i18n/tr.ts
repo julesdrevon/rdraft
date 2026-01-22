@@ -1,4 +1,5 @@
 export const tr = {
+  siteDescription: "Müttefiklerinizi ekleyin ve draftı başlatın: her oyuncu sırayla şampiyonunu ve koridorunu almak için kurayla belirlenir ve bir sonrakiler için mevcut seçenekler azalır.",
   addPlayer: "Oyuncu Ekle",
   addPlayerModal: "Oyuncu Ekle",
   usernamePlaceholder: "Kullanıcı adı...",

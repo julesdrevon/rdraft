@@ -1,4 +1,5 @@
 export const es = {
+  siteDescription: "Añade a tus aliados y comienza el draft: cada jugador es sorteado para recibir su campeón y lane, reduciendo las opciones disponibles para los siguientes.",
   addPlayer: "Añadir jugador",
   addPlayerModal: "Añadir un Jugador",
   usernamePlaceholder: "Nombre de usuario...",

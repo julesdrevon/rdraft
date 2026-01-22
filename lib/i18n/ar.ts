@@ -1,4 +1,5 @@
 export const ar = {
+  siteDescription: "أضف حلفاءك وابدأ المسودة: يتم سحب كل لاعب بالقرعة لتلقي بطله ومساره، مما يقلل من الخيارات المتاحة لمن يليه.",
   addPlayer: "إضافة لاعب",
   addPlayerModal: "إضافة لاعب",
   usernamePlaceholder: "...اسم المستخدم",

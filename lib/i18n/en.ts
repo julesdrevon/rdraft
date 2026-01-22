@@ -1,4 +1,5 @@
 export const en = {
+  siteDescription: "Add your allies and start the draft: each player is drawn to receive their champion and lane, reducing the available options for the next ones.",
   addPlayer: "Add Player",
   addPlayerModal: "Add a Player",
   usernamePlaceholder: "Username...",
