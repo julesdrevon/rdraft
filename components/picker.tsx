@@ -184,6 +184,22 @@ export function Picker() {
   }, [currentPlayerIndex, isStarted, displayCount, list]);
 
   React.useEffect(() => {
+    if (isStarted && displayCount === list.length && currentPlayerIndex === list.length - 1) {
+      if (selectedChampIndex === null) {
+        const lastUnassignedIndex = results.findIndex(r => !r.playerName);
+        if (lastUnassignedIndex !== -1) {
+          setSelectedChampIndex(lastUnassignedIndex);
+        }
+      } else {
+        const availableLanes = getAvailableLanes();
+        if (availableLanes.length === 1) {
+          assignSelection(availableLanes[0]);
+        }
+      }
+    }
+  }, [currentPlayerIndex, results, displayCount, isStarted, selectedChampIndex, list.length]);
+
+  React.useEffect(() => {
     const updateLocale = async () => {
       if (!latestVersion) return;
       try {
@@ -392,7 +408,7 @@ export function Picker() {
   const isFinished = isStarted && displayCount === list.length && currentPlayerIndex === list.length;
 
   return (
-    <main className="relative min-h-dvh flex flex-col items-center justify-start pt-6 sm:pt-12 bg-stone-950 p-4 overflow-hidden gap-4 sm:gap-8">
+    <main className="relative h-dvh flex flex-col items-center justify-start pt-2 sm:pt-6 bg-stone-950 p-4 overflow-hidden gap-1 sm:gap-4">
       <div className="w-full flex flex-col items-center justify-center relative z-60 gap-2">
         <div className="relative group">
           <h1 
@@ -481,8 +497,8 @@ export function Picker() {
       )}
 
       {!isFinished && (
-      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-      <Card className="relative w-full min-w-sm bg-transparent border-0 ring-0 shadow-none pointer-events-auto">
+      <div className="relative z-10 flex-1 flex items-center justify-center w-full">
+      <Card className="relative w-full min-w-sm bg-transparent border-0 ring-0 shadow-none">
         {isStarted && (
         <CardHeader>
           <div className="flex flex-col mt-1">
@@ -608,7 +624,7 @@ export function Picker() {
                   const laneB = b.lane || "";
                   return ALL_LANES.indexOf(laneA) - ALL_LANES.indexOf(laneB);
                 }).map((champ, index) => (
-                  <div key={champ.uid} className="relative w-[17vw] h-[25dvh] sm:w-[15vw] sm:h-[55dvh] max-h-[450px] sm:max-w-[240px] overflow-hidden rounded-lg border border-stone-800 group shadow-2xl">
+                  <div key={champ.uid} className="relative w-[17vw] h-[22dvh] sm:w-[15vw] sm:h-[45dvh] max-h-[450px] sm:max-w-[240px] overflow-hidden rounded-lg border border-stone-800 group shadow-2xl">
                       <img
                         src={`https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${champ.id}_0.jpg`}
                         alt={champ.name}

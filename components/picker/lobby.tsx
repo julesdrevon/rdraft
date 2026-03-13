@@ -65,7 +65,7 @@ export function Lobby({ players, onAddPlayer, onRemovePlayer, t }: LobbyProps) {
     <div className="w-full flex flex-col items-center">
       
       {}
-      <div className="flex flex-row flex-nowrap sm:flex-wrap items-center justify-center gap-1.5 sm:gap-6 pt-2 sm:pt-12 pb-4 relative">
+      <div className="flex flex-row flex-nowrap sm:flex-wrap items-center justify-center gap-1.5 sm:gap-6 pt-1 sm:pt-4 pb-2 relative">
         
 
 
@@ -86,7 +86,7 @@ export function Lobby({ players, onAddPlayer, onRemovePlayer, t }: LobbyProps) {
             >
               {}
               <div className={cn(
-                "w-[17vw] sm:w-[14vw] h-[20dvh] sm:h-[45dvh] max-h-[400px] sm:max-w-[200px] rounded-lg flex items-center justify-center transition-all relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10",
+                "w-[17vw] sm:w-[14vw] h-[18dvh] sm:h-[40dvh] max-h-[400px] sm:max-w-[200px] rounded-lg flex items-center justify-center transition-all relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10",
                 isFilled 
                   ? "bg-white/10 shadow-2xl border-white/20" 
                   : "hover:bg-white/15 shadow-xl"
