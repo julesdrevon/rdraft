@@ -66,10 +66,20 @@ export async function getChampions(version: string, locale: string): Promise<Cha
   return request;
 }
 
-/** Splash art of a random skin of a random champion, for the backdrop. */
-export async function getRandomSplash(version: string, locale: string): Promise<string | null> {
+/**
+ * Splash art of a random skin of a random champion, for the backdrop.
+ *
+ * The champion list is passed in rather than fetched: the caller already holds
+ * one, and asking for a second locale purely to pick an id — champion ids are
+ * the same in every language — used to cost a redundant 300 kB download for
+ * everyone not playing in English.
+ */
+export async function getRandomSplash(
+  version: string,
+  locale: string,
+  champions: Champion[],
+): Promise<string | null> {
   try {
-    const champions = await getChampions(version, locale);
     const champion = sample(champions);
     if (!champion) return null;
 

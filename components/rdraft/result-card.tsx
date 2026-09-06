@@ -59,7 +59,15 @@ export function ResultCard({
         src={ddragon.championLoading(slot.championId)}
         alt=""
         fill
-        sizes="(max-width: 640px) 20vw, 230px"
+        sizes="(max-width: 640px) 150px, 230px"
+        // Every card is on screen at once, and copies of this card are rendered
+        // off-screen during the draft to warm the cache — neither case wants
+        // the viewport-gated default.
+        loading="eager"
+        // Two thirds of the art sits under a black gradient and the rest under
+        // the player's name, so the extra fidelity of quality 75 is spent on
+        // pixels nobody looks at.
+        quality={60}
         className={cn(
           "object-cover transition-all duration-500",
           rerolling

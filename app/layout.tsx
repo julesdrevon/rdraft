@@ -3,6 +3,8 @@ import { Noto_Sans } from "next/font/google";
 import localFont from "next/font/local";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
+import { ASSET_ORIGINS } from "@/lib/ddragon/urls";
+
 import "./globals.css";
 import "flag-icons/css/flag-icons.min.css";
 
@@ -39,6 +41,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr" className={`${notoSans.variable} ${league.variable} dark`} suppressHydrationWarning>
+      <head>
+        {/* Champion data, art and voice lines all live off-site, and their URLs
+            are only known once the version lookup resolves. Opening the
+            connections now takes DNS and TLS off that critical path. */}
+        {ASSET_ORIGINS.map((origin) => (
+          <link key={origin} rel="preconnect" href={origin} crossOrigin="anonymous" />
+        ))}
+      </head>
       <body className="font-sans antialiased">
         {children}
         <SpeedInsights />

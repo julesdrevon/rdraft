@@ -43,27 +43,31 @@ export function ChampionSlot({
           !selectable && "cursor-default",
         )}
       >
-        {revealed && version ? (
-          <>
-            <Image
-              src={ddragon.championSquare(version, slot.imageFull)}
-              alt=""
-              fill
-              sizes="96px"
-              className={cn(
-                "object-cover transition-all duration-500",
-                taken ? "opacity-55 grayscale" : "opacity-100 grayscale-0",
-              )}
-            />
-
-            {slot.lane && (
-              <span className="text-micro bg-gold absolute inset-x-0 bottom-0 py-0.5 text-center text-stone-950">
-                {slot.lane}
-              </span>
+        {/* The portrait is fetched as soon as the slot exists rather than when
+            it flips over. Reveals land a second apart, so gating the download
+            on `revealed` meant every single one started from cold. */}
+        {version && (
+          <Image
+            src={ddragon.championSquare(version, slot.imageFull)}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 64px, 96px"
+            className={cn(
+              "object-cover transition-all duration-500",
+              !revealed && "opacity-0",
+              revealed && (taken ? "opacity-55 grayscale" : "opacity-100 grayscale-0"),
             )}
-          </>
-        ) : (
-          <span className="flex size-full items-center justify-center">
+          />
+        )}
+
+        {revealed && slot.lane && (
+          <span className="text-micro bg-gold absolute inset-x-0 bottom-0 py-0.5 text-center text-stone-950">
+            {slot.lane}
+          </span>
+        )}
+
+        {!revealed && (
+          <span className="absolute inset-0 flex items-center justify-center">
             <Spinner className="text-gold/50 size-5" />
           </span>
         )}

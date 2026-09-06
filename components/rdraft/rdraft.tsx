@@ -24,9 +24,6 @@ const ROULETTE_STEP_MS = 60;
 const LANG_KEY = "rdraft:lang";
 const VOLUME_KEY = "rdraft:volume";
 
-/** Champion names change with the language; splash art does not. */
-const SPLASH_LOCALE = "en_US";
-
 export function Rdraft() {
   const [state, dispatch] = React.useReducer(draftReducer, initialDraftState);
 
@@ -96,18 +93,25 @@ export function Rdraft() {
     };
   }, [version, locale.data]);
 
+  // The backdrop reuses the champion list the pool is built from, so switching
+  // language costs no extra request — and picks its champion once, rather than
+  // swapping a megabyte of artwork every time the language changes.
+  const backdropPicked = React.useRef(false);
+
   React.useEffect(() => {
-    if (!version) return;
+    if (!version || pool.length === 0 || backdropPicked.current) return;
+    backdropPicked.current = true;
+
     let cancelled = false;
 
-    getRandomSplash(version, SPLASH_LOCALE).then((url) => {
+    getRandomSplash(version, locale.data, pool).then((url) => {
       if (!cancelled) setBackdrop(url);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [version]);
+  }, [version, pool, locale.data]);
 
   /* ---------------------------------------------------------------- reveals */
 

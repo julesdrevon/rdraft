@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 
 import { ChampionSlot } from "./champion-slot";
 import { LaneSelector } from "./lane-selector";
+import { ResultCard } from "./result-card";
+
+const noop = () => {};
 
 interface StageDraftProps {
   state: DraftState;
@@ -94,6 +97,25 @@ export function StageDraft({
           <Trash2 className="mr-2 size-4" />
           {t.clearAll}
         </Button>
+      </div>
+
+      {/* The results screen is a lane pick or two away, and its loading-screen
+          art is the heaviest thing the app shows. Rendering the real cards
+          off-screen — same component, same viewport-relative widths, so the
+          browser picks the same srcset entries — lets that download happen
+          during the draft instead of at the reveal. */}
+      <div aria-hidden inert className="pointer-events-none fixed top-0 -left-[400vw] flex">
+        {state.slots.map((slot) => (
+          <ResultCard
+            key={slot.uid}
+            slot={slot}
+            version={version}
+            rerolling={false}
+            onReroll={noop}
+            onRerollSettled={noop}
+            t={t}
+          />
+        ))}
       </div>
     </section>
   );

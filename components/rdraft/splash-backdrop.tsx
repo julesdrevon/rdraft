@@ -22,7 +22,12 @@ export function SplashBackdrop({ src }: { src: string | null }) {
           alt=""
           fill
           priority
-          sizes="100vw"
+          // A 6px blur under a near-opaque gradient hides every trace of
+          // compression, so the backdrop is fetched at a fraction of the bytes
+          // a sharp image would need — and never above 1080px wide, whatever
+          // the viewport or pixel ratio.
+          quality={35}
+          sizes="(max-width: 640px) 640px, 1080px"
           className={cn(
             "scale-105 object-cover blur-[6px] transition-opacity duration-1000 ease-out",
             loaded ? "opacity-100" : "opacity-0",
