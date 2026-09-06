@@ -22,4 +22,8 @@ export const ko = {
   reveal: "폭로하다",
   guessWho: "누가 말하고 있나요?",
   audioNotice: "오디오를 재생하는 데 시간이 걸릴 수 있습니다",
+  volume: "음량",
+  dataError: "게임 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+  retry: "다시 시도",
+  playVoice: "음성 다시 재생",
 };

@@ -22,4 +22,8 @@ export const en = {
   reveal: "Reveal",
   guessWho: "Who is speaking?",
   audioNotice: "Audio might take time to play",
+  volume: "Volume",
+  dataError: "Game data could not be loaded. Try again in a moment.",
+  retry: "Retry",
+  playVoice: "Play the line again",
 };

@@ -22,4 +22,8 @@ export const ja = {
   reveal: "明かす",
   guessWho: "誰が話している？",
   audioNotice: "音声の再生に時間がかかる場合があります",
+  volume: "音量",
+  dataError: "ゲームデータを読み込めませんでした。しばらくしてからもう一度お試しください。",
+  retry: "再試行",
+  playVoice: "音声をもう一度再生",
 };

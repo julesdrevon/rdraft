@@ -22,4 +22,8 @@ export const fr = {
   reveal: "Révéler",
   guessWho: "Qui parle ?",
   audioNotice: "Les audios peuvent prendre du temps à être joués",
+  volume: "Volume",
+  dataError: "Impossible de charger les données du jeu. Réessayez dans un instant.",
+  retry: "Réessayer",
+  playVoice: "Rejouer l'audio",
 };
