@@ -1,42 +1,45 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
-import "./globals.css";
-import "flag-icons/css/flag-icons.min.css";
+import type { Metadata, Viewport } from "next";
+import { Noto_Sans } from "next/font/google";
 import localFont from "next/font/local";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const notoSans = Noto_Sans({variable:'--font-sans', subsets: ["latin"]});
+import "./globals.css";
+import "flag-icons/css/flag-icons.min.css";
 
-const leagueFont = localFont({
+const notoSans = Noto_Sans({
+  variable: "--font-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+/** Riot's display face, used for the wordmark only. */
+const league = localFont({
   src: "./fonts/League.otf",
   variable: "--font-league",
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Rdraft",
-  description: "Composition de draft League of Legends aléatoire",
+  title: "Rdraft — tirage au sort de draft League of Legends",
+  description:
+    "Ajoutez vos alliés, lancez le tirage : chaque joueur reçoit un champion et une lane au hasard.",
+  applicationName: "Rdraft",
+  openGraph: {
+    title: "Rdraft",
+    description: "Tirage au sort de champions et de lanes pour votre équipe.",
+    type: "website",
+  },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = {
+  themeColor: "#0a0908",
+  colorScheme: "dark",
+};
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" className={`${notoSans.variable} ${leagueFont.variable} dark`} suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="fr" className={`${notoSans.variable} ${league.variable} dark`} suppressHydrationWarning>
+      <body className="font-sans antialiased">
         {children}
         <SpeedInsights />
       </body>

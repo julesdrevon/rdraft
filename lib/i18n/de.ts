@@ -22,4 +22,8 @@ export const de = {
   reveal: "Enthüllen",
   guessWho: "Wer spricht?",
   audioNotice: "Audio kann einige Zeit zum Abspielen benötigen",
+  volume: "Lautstärke",
+  dataError: "Die Spieldaten konnten nicht geladen werden. Versuche es gleich erneut.",
+  retry: "Erneut versuchen",
+  playVoice: "Ansage erneut abspielen",
 };

@@ -22,4 +22,8 @@ export const tr = {
   reveal: "Açığa çıkarmak",
   guessWho: "Kim konuşuyor?",
   audioNotice: "Sesin oynatılması biraz zaman alabilir",
+  volume: "Ses seviyesi",
+  dataError: "Oyun verileri yüklenemedi. Birazdan tekrar deneyin.",
+  retry: "Yeniden dene",
+  playVoice: "Sesi tekrar oynat",
 };

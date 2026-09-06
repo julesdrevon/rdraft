@@ -1,54 +1,41 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 interface SliderProps {
-  value: number
-  onChange: (value: number) => void
-  min?: number
-  max?: number
-  step?: number
-  className?: string
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  className?: string;
+  "aria-label"?: string;
 }
 
-export function Slider({ 
-  value, 
-  onChange, 
-  min = 0, 
-  max = 1, 
-  step = 0.01, 
-  className 
+export function Slider({
+  value,
+  onChange,
+  min = 0,
+  max = 1,
+  step = 0.01,
+  className,
+  ...props
 }: SliderProps) {
+  const filled = ((value - min) / (max - min)) * 100;
+
   return (
-    <div className={cn("relative flex items-center select-none touch-none w-full h-5", className)}>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-1 bg-stone-800 rounded-lg appearance-none cursor-pointer accent-[#c89c38] hover:accent-[#a6822d] transition-all"
-        style={{
-          background: `linear-gradient(to right, #c89c38 0%, #c89c38 ${value * 100}%, #292524 ${value * 100}%, #292524 100%)`
-        }}
-      />
-      <style jsx>{`
-        input[type='range']::-webkit-slider-thumb {
-          appearance: none;
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: #c89c38;
-          border: 2px solid #1c1917;
-          box-shadow: 0 0 10px rgba(0,0,0,0.5);
-          transition: transform 0.1s ease;
-        }
-        input[type='range']::-webkit-slider-thumb:hover {
-          transform: scale(1.2);
-        }
-      `}</style>
-    </div>
-  )
+    <input
+      type="range"
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      onChange={(event) => onChange(Number.parseFloat(event.target.value))}
+      className={cn("range-gold h-3 w-full touch-none select-none", className)}
+      style={{
+        background: `linear-gradient(to right, var(--color-gold) 0 ${filled}%, rgb(255 255 255 / 10%) ${filled}% 100%)`,
+      }}
+      {...props}
+    />
+  );
 }

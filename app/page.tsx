@@ -1,5 +1,5 @@
-import { Picker } from "@/components/picker";
+import { Rdraft } from "@/components/rdraft/rdraft";
 
 export default function Page() {
-return <Picker />;
+  return <Rdraft />;
 }
